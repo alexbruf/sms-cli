@@ -613,6 +613,12 @@ export class DB {
       .run(id);
   }
 
+  getWebhooksByEvent(event: string): DbGatewayWebhook[] {
+    return this.db
+      .prepare("SELECT * FROM gateway_webhooks WHERE event = ?")
+      .all(event) as unknown as DbGatewayWebhook[];
+  }
+
   close(): void {
     this.db.close();
   }

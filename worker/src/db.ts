@@ -493,4 +493,12 @@ export class DB {
       .bind(id)
       .run();
   }
+
+  async getWebhooksByEvent(event: string): Promise<DbGatewayWebhook[]> {
+    const { results } = await this.d1
+      .prepare("SELECT * FROM gateway_webhooks WHERE event = ?")
+      .bind(event)
+      .all<DbGatewayWebhook>();
+    return results;
+  }
 }

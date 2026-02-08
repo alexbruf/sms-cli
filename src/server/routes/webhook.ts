@@ -38,6 +38,21 @@ export function webhookRoutes(): Hono<Env> {
 
     if (inserted) {
       console.log(`Received SMS from ${phoneNumber}: ${message.slice(0, 50)}`);
+
+      // Fan out to registered 3rd-party webhooks
+      const webhooks = db.getWebhooksByEvent("sms:received");
+      if (webhooks.length > 0) {
+        const payload = JSON.stringify(body);
+        Promise.allSettled(
+          webhooks.map((wh) =>
+            fetch(wh.url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: payload,
+            })
+          )
+        );
+      }
     }
 
     return c.json({ id, duplicate: !inserted });

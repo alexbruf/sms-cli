@@ -283,6 +283,35 @@ Core endpoints (both modes):
 | DELETE | `/3rdparty/v1/webhooks/:id` | Delete webhook |
 | GET | `/3rdparty/v1/health` | Health check |
 
+### Webhook fan-out
+
+When an incoming SMS arrives (via `POST /webhook` from the Android app), the server stores it and then fans out the raw payload to all registered 3rd-party webhooks with event `sms:received`. This lets you build automations — forward incoming texts to Slack, trigger a Zapier workflow, log to a spreadsheet, etc.
+
+Register a webhook via the 3rd-party API:
+
+```bash
+curl -X POST -u <login>:<password> \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://your-endpoint.com/hook", "event": "sms:received"}' \
+  https://your-server/3rdparty/v1/webhooks
+```
+
+Each registered URL receives a POST with the same `WebhookPayload` body the server received from the Android app:
+
+```json
+{
+  "event": "sms:received",
+  "payload": {
+    "phoneNumber": "+15551234567",
+    "message": "Hello!",
+    "receivedAt": "2026-02-07T12:00:00Z",
+    "simNumber": 1
+  }
+}
+```
+
+Webhook deliveries are fire-and-forget — failures are silently ignored and not retried.
+
 ---
 
 ## Environment Variables
