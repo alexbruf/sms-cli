@@ -3,7 +3,21 @@ import type { Env } from "../app.ts";
 import { messageId } from "../hash.ts";
 import type { WebhookPayload } from "../types.ts";
 
-export function webhookRoutes(): Hono<Env> {
+async function signPayload(payload: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export function webhookRoutes(signingKey: string): Hono<Env> {
   const routes = new Hono<Env>();
 
   routes.post("/webhook", async (c) => {
@@ -39,11 +53,17 @@ export function webhookRoutes(): Hono<Env> {
       const webhooks = await db.getWebhooksByEvent("sms:received");
       if (webhooks.length > 0) {
         const payload = JSON.stringify(body);
+        const signature = signingKey
+          ? await signPayload(payload, signingKey)
+          : "";
         await Promise.allSettled(
           webhooks.map((wh) =>
             fetch(wh.url, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                ...(signature && { "X-Webhook-Signature": `sha256=${signature}` }),
+              },
               body: payload,
             })
           )

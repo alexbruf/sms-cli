@@ -59,7 +59,7 @@ export function createApp(opts: AppOptions): Hono<Env> {
   app.route("/", sendRoutes());
   app.route("/", conversationRoutes());
   app.route("/", contactRoutes());
-  app.route("/", webhookRoutes());
+  app.route("/", webhookRoutes(opts.webhookSigningKey));
   app.route("/", searchRoutes());
 
   // Private mode routes (always enabled on Workers)

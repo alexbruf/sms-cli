@@ -310,6 +310,23 @@ Each registered URL receives a POST with the same `WebhookPayload` body the serv
 }
 ```
 
+Each request includes an `X-Webhook-Signature` header containing an HMAC-SHA256 signature of the JSON body, using the server's `WEBHOOK_SIGNING_KEY`:
+
+```
+X-Webhook-Signature: sha256=<hex digest>
+```
+
+To verify on the receiving end (Node.js example):
+
+```js
+import { createHmac } from "crypto";
+
+function verify(body, signature, secret) {
+  const expected = "sha256=" + createHmac("sha256", secret).update(body).digest("hex");
+  return expected === signature;
+}
+```
+
 Webhook deliveries are fire-and-forget — failures are silently ignored and not retried.
 
 ---
