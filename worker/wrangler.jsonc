@@ -1,0 +1,27 @@
+{
+  "name": "sms-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-02-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sms-server",
+      "database_id": ""  // Run: wrangler d1 create sms-server
+    }
+  ],
+
+  // Uncomment and set your custom domain:
+  // "routes": [
+  //   { "pattern": "sms.yourdomain.com", "custom_domain": true }
+  // ],
+
+  "vars": {
+    "GATEWAY_MODE": "private"
+  }
+
+  // Production secrets (set via `wrangler secret put`):
+  // PRIVATE_TOKEN, PUBLIC_URL, WEBHOOK_SIGNING_KEY
+  // ASG_ENDPOINT, ASG_USERNAME, ASG_PASSWORD (proxy mode)
+}

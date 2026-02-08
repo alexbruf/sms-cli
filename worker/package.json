@@ -1,0 +1,26 @@
+{
+  "name": "sms-server-worker",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "d1:create": "wrangler d1 create sms-server",
+    "d1:migrate": "wrangler d1 migrations apply sms-server --local",
+    "d1:migrate:remote": "wrangler d1 migrations apply sms-server --remote"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "hono": "^4.11.8"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.12.10",
+    "@cloudflare/workers-types": "^4.20260207.0",
+    "@types/bcryptjs": "^2.4.6",
+    "vitest": "^2.1.0",
+    "wrangler": "^4.63.0"
+  }
+}
