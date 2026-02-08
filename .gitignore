@@ -44,7 +44,8 @@ sms-linux-arm64
 # database
 *.db
 
-# worker dev files
+# worker dev/deploy files
+worker/wrangler.jsonc
 worker/.dev.vars
 worker/.wrangler/
 
